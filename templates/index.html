@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>淨水地圖 - 靜宜大學專案</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; margin: 0; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #map { height: 450px; width: 100%; border-radius: 8px; }
+        .input-group { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-blue { background: #3498db; color: white; }
+        .btn-green { background: #2ecc71; color: white; }
+        #statusLabel { font-size: 0.9em; color: #e67e22; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>💧 淨水地圖 (Water Refresh Map)</h1>
+        <p>團隊：重生之要當富豪榜前4 | 響應 SDG 6 [cite: 3, 16]</p>
+        
+        <div class="input-group">
+            <input type="text" id="locName" placeholder="飲水機位置 (如：主顧樓 1F)">
+            <input type="date" id="filterDate">
+        </div>
+        <div class="input-group">
+            <button class="btn-blue" onclick="getLocation()">📌 獲取目前定位</button>
+            <button class="btn-green" onclick="submitLocation()">✅ 上傳至資料庫</button>
+        </div>
+        <p id="statusLabel">請點擊按鈕獲取位置資訊...</p>
+    </div>
+
+    <div id="map"></div>
+</div>
+
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQrkk87bD2qt2zJtxLDd2oirD2JfFtRjs&callback=initMap"></script>
+
+<script>
+    let map;
+    let currentUserCoords = null;
+    const puCenter = { lat: 24.2268, lng: 120.5772 }; // 靜宜大學中心點 [cite: 14]
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 17,
+            center: puCenter,
+        });
+        loadMarkers();
+    }
+
+    function loadMarkers() {
+        fetch('/get_fountains').then(res => res.json()).then(data => {
+            data.forEach(item => {
+                const marker = new google.maps.Marker({
+                    position: { lat: item.lat, lng: item.lng },
+                    map: map,
+                    title: item.location_name
+                });
+                const info = new google.maps.InfoWindow({
+                    content: `<b>${item.location_name}</b><br>濾心更新：${item.last_filter_change}<br>狀態：正常`
+                });
+                marker.addListener("click", () => info.open(map, marker));
+            });
+        });
+    }
+
+    // 強化版的定位函式
+// 強化版的定位函式
+function getLocation() {
+    const label = document.getElementById("statusLabel");
+    label.innerText = "📍 正在喚醒 GPS 裝置，請稍候...";
+
+    // 檢查瀏覽器是否支援定位
+    if (!navigator.geolocation) {
+        label.innerText = "❌ 您的瀏覽器不支援定位功能。";
+        return;
+    }
+
+    // 設定定位參數 (Options)
+    // 在你的 getLocation 函式中修改 options
+const options = {
+    enableHighAccuracy: false, // 改為 false，讓它先用 Wi-Fi 或基地台快速定位，不要硬抓 GPS
+    timeout: 5000,
+    maximumAge: 30000          // 允許使用 30 秒內的舊位置資料
+};
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            // 成功獲取座標 [cite: 25]
+            currentUserCoords = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            
+            label.style.color = "#27ae60"; // 成功時顯示綠色
+            label.innerText = `✅ 定位成功：${currentUserCoords.lat.toFixed(5)}, ${currentUserCoords.lng.toFixed(5)}`;
+            
+            // 地圖中心跳轉並放置「你」的標記
+            map.setCenter(currentUserCoords);
+            map.setZoom(18); // 縮放級別拉近
+            
+            new google.maps.Marker({
+                position: currentUserCoords,
+                map: map,
+                label: "你",
+                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' // 藍色小圓點標記自己
+            });
+        },
+        (error) => {
+            // 針對失敗原因進行詳細偵錯
+            label.style.color = "#e74c3c"; // 失敗時顯示紅色
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    label.innerText = "❌ 定位失敗：請在網址列左側開啟「位置資訊」存取權限。";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    label.innerText = "❌ 定位失敗：無法偵測到位置，請確認是否開啟手機/電腦的 GPS 開關。";
+                    break;
+                case error.TIMEOUT:
+                    label.innerText = "❌ 定位失敗：連線逾時，請重試一次。";
+                    break;
+                default:
+                    label.innerText = "❌ 定位失敗：發生未知錯誤。";
+            }
+        },
+        options
+    );
+}
+
+    function submitLocation() {
+        const name = document.getElementById("locName").value;
+        const date = document.getElementById("filterDate").value;
+        if (!name || !currentUserCoords) return alert("請先完成定位並填寫名稱！");
+
+        fetch('/add_fountain', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, date, lat: currentUserCoords.lat, lng: currentUserCoords.lng })
+        })
+        .then(res => res.json())
+        .then(data => { alert(data.message); location.reload(); });
+    }
+</script>
+</body>
+</html>
