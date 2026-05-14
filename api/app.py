@@ -48,15 +48,20 @@ def get_fountains():
 def add_fountain():
     try:
         data = request.json
-        new_doc = db.collection('water_fountains').document()
-        new_doc.set({
-            'location_name': data.get('name'),
+        location_name = data.get('name') # 取得飲水機名稱
+        
+        # 使用名稱作為文件 ID (或是尋找座標相近的文件)
+        # 這樣當使用者二輸入相同的名稱時，會直接更新該筆資料
+        doc_ref = db.collection('water_fountains').document(location_name)
+        
+        doc_ref.set({
+            'location_name': location_name,
             'lat': float(data.get('lat')),
             'lng': float(data.get('lng')),
             'last_filter_change': data.get('date'),
-            'status': "正常"
+            'status': data.get('status') # 這裡會被使用者二更新為「故障」
         })
-        return jsonify({"status": "success", "message": "定位已成功上傳至 Firebase！"}), 200
+        return jsonify({"status": "success", "message": f"「{location_name}」資訊已更新！"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 

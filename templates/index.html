@@ -66,13 +66,24 @@
         
         <!-- 在輸入組中新增選單 -->
 <div class="input-group">
-    <input type="text" id="locName" placeholder="飲水機位置 (如：主顧樓 1F)">
+    <!-- 大樓選擇：加入 onchange 事件 -->
+    <select id="building" onchange="updateFloors()" style="padding: 10px; flex: 1; border: 1px solid #ddd; border-radius: 4px;">
+        <option value="">請選擇大樓</option>
+        <option value="西嘉學苑">西嘉學苑</option>
+        <option value="主顧樓">主顧樓</option>
+    </select>
+
+    <!-- 樓層選擇：初始為空 -->
+    <select id="floor" style="padding: 10px; width: 100px; border: 1px solid #ddd; border-radius: 4px;">
+        <option value="">樓層</option>
+    </select>
+
     <input type="date" id="filterDate">
-    <!-- 新增：狀態選擇列 -->
+
     <select id="machineStatus" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
         <option value="正常">✅ 正常</option>
-        <option value="故障/維修中">❌ 故障/維修中</option>
-        <option value="濾心待更換">⚠️ 濾心待更換</option>
+        <option value="故障">❌ 故障</option>
+        <option value="維修中">🛠️ 維修中</option>
     </select>
 </div>
         <div class="input-group">
@@ -266,6 +277,35 @@ const options = {
         console.error("Error:", err);
         alert("上傳失敗，請檢查網路連線。");
     });
+}
+
+function updateFloors() {
+    const building = document.getElementById("building").value;
+    const floorSelect = document.getElementById("floor");
+    
+    // 清空現有選項
+    floorSelect.innerHTML = "";
+
+    let maxFloor = 0;
+    if (building === "西嘉學苑") {
+        maxFloor = 5; // 西嘉有五層
+    } else if (building === "主顧樓") {
+        maxFloor = 6; // 主顧有六層
+    }
+
+    // 動態產生樓層選項
+    for (let i = 1; i <= maxFloor; i++) {
+        const opt = document.createElement("option");
+        opt.value = i + "F";
+        opt.innerHTML = i + "F";
+        floorSelect.appendChild(opt);
+    }
+    
+    if (maxFloor === 0) {
+        const opt = document.createElement("option");
+        opt.innerHTML = "樓層";
+        floorSelect.appendChild(opt);
+    }
 }
 </script>
 </body>
