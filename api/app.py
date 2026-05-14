@@ -29,8 +29,11 @@ db = firestore.client()
 # --- 路由設定 ---
 
 @app.route('/')
-def index():
-    # 從環境變數讀取 Google Maps API Key 傳給前端
+def home():
+    return render_template('home.html')
+
+@app.route('/map')
+def map_page():
     maps_key = os.environ.get('GOOGLE_MAPS_API_KEY', 'YOUR_API_KEY_HERE')
     return render_template('index.html', google_maps_api_key=maps_key)
 
