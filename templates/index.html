@@ -68,10 +68,14 @@
 <div class="input-group">
     <!-- 大樓選擇：加入 onchange 事件 -->
     <select id="building" onchange="updateFloors()" style="padding: 10px; flex: 1; border: 1px solid #ddd; border-radius: 4px;">
-        <option value="">請選擇大樓</option>
-        <option value="西嘉學苑">西嘉學苑</option>
-        <option value="主顧樓">主顧樓</option>
-    </select>
+    <option value="">請選擇大樓</option>
+    <option value="主顧樓">主顧樓</option>
+    <option value="格致樓">格致樓</option>
+    <option value="任垣樓">任垣樓</option>
+    <option value="伯鐸樓">伯鐸樓</option>
+    <option value="方濟樓">方濟樓</option>
+    <option value="西嘉學苑">西嘉學苑</option>
+</select>
 
     <!-- 樓層選擇：初始為空 -->
     <select id="floor" style="padding: 10px; width: 100px; border: 1px solid #ddd; border-radius: 4px;">
@@ -280,33 +284,34 @@ const options = {
 }
 
 function updateFloors() {
-    const building = document.getElementById("building").value;
-    const floorSelect = document.getElementById("floor");
-    
-    // 清空現有選項
-    floorSelect.innerHTML = "";
+        const building = document.getElementById("building").value;
+        const floorSelect = document.getElementById("floor");
+        floorSelect.innerHTML = "";
 
-    let maxFloor = 0;
-    if (building === "西嘉學苑") {
-        maxFloor = 5; // 西嘉有五層
-    } else if (building === "主顧樓") {
-        maxFloor = 6; // 主顧有六層
-    }
+        const floorConfig = {
+            "主顧樓": 7,
+            "格致樓": 7,
+            "任垣樓": 6,
+            "伯鐸樓": 4,
+            "方濟樓": 4,
+            "西嘉學苑": 5
+        };
 
-    // 動態產生樓層選項
-    for (let i = 1; i <= maxFloor; i++) {
-        const opt = document.createElement("option");
-        opt.value = i + "F";
-        opt.innerHTML = i + "F";
-        floorSelect.appendChild(opt);
+        const maxFloor = floorConfig[building] || 0;
+
+        for (let i = 1; i <= maxFloor; i++) {
+            const opt = document.createElement("option");
+            opt.value = i + "F";
+            opt.textContent = i + "F";
+            floorSelect.appendChild(opt);
+        }
+        
+        if (maxFloor === 0) {
+            const opt = document.createElement("option");
+            opt.textContent = "樓層";
+            floorSelect.appendChild(opt);
+        }
     }
-    
-    if (maxFloor === 0) {
-        const opt = document.createElement("option");
-        opt.innerHTML = "樓層";
-        floorSelect.appendChild(opt);
-    }
-}
 </script>
 </body>
 </html>
