@@ -26,7 +26,6 @@ if not firebase_admin._apps:
             print("警告：找不到 Firebase 設定資料")
 
 db = firestore.client()
-
 # --- 路由設定 ---
 
 @app.route('/')
