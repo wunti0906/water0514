@@ -56,13 +56,43 @@
     .main-content { flex-direction: column; height: auto; }
     #map { height: 300px; }
 }
+/* 新增：回首頁按鈕樣式 */
+.btn-home {
+    background: #95a5a6; /* 灰色調，與功能按鈕區隔 */
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-home:hover {
+    background: #7f8c8d;
+    transform: translateY(-2px);
+}
+
+/* 標題區域佈局優化 */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="card">
+<div class="card">
+    <div class="header-row">
         <h1>💧 淨水地圖 (Water Refresh Map)</h1>
-        <p>團隊：重生之要當富豪榜前4 | 響應 SDG 6</p>
+        <a href="/" class="btn-home">🏠 回到專案首頁</a>
+    </div>
+    <p class="team-info">團隊：重生之要當富豪榜前4 | 響應 SDG 6</p>
         
         <!-- 在輸入組中新增選單 -->
 <div class="input-group">
