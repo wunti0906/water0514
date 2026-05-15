@@ -266,18 +266,24 @@ const options = {
 }
 
     function submitLocation() {
-    const name = document.getElementById("locName").value;
+    const building = document.getElementById("building").value;
+    const floor = document.getElementById("floor").value;
     const date = document.getElementById("filterDate").value;
+    const status = document.getElementById("machineStatus").value;
     
-    if (!name || !currentUserCoords) {
-        return alert("請先完成定位並填寫名稱！");
+    // 組合名稱，例如「主顧樓 2F」
+    const name = `${building} ${floor}`;
+    
+    if (!building || !floor || !currentUserCoords) {
+        return alert("請先完成定位並選擇大樓與樓層！");
     }
 
     const payload = { 
-        name, 
-        date, 
+        name: name, 
+        date: date, 
         lat: currentUserCoords.lat, 
-        lng: currentUserCoords.lng 
+        lng: currentUserCoords.lng,
+        status: status // 確保有傳送狀態
     };
 
     fetch('/add_fountain', {
@@ -289,22 +295,11 @@ const options = {
     .then(data => {
         alert(data.message);
         
-        // --- 核心改動：立即在畫面上新增標記 ---
-        const newMarker = new google.maps.Marker({
-            position: { lat: payload.lat, lng: payload.lng },
-            map: map,
-            title: payload.name,
-            animation: google.maps.Animation.DROP // 增加掉落動畫增加視覺回饋
-        });
-
-        const info = new google.maps.InfoWindow({
-            content: `<b>${payload.name}</b><br>濾心更新：${payload.date}<br>狀態：正常`
-        });
-
-        newMarker.addListener("click", () => info.open(map, newMarker));
+        // 關鍵修正：上傳成功後，重新呼叫 loadMarkers() 
+        // 這樣右側列表和地圖標記才會根據資料庫最新狀態完整重整
+        loadMarkers(); 
         
-        // 清空輸入框
-        document.getElementById("locName").value = "";
+        // 清空輸入（選填）
         document.getElementById("filterDate").value = "";
     })
     .catch(err => {
