@@ -35,7 +35,7 @@ def home():
 @app.route('/map')
 def map_page():
     # 這裡的變數名稱必須跟 Vercel 設定的一模一樣
-    maps_key = os.environ.get('GOOGLE_MAPS_API_KEY') 
+    maps_key = os.environ.get('Maps_API_KEY') 
     return render_template('index.html', google_maps_api_key=maps_key)
 
 @app.route('/get_fountains', methods=['GET'])
