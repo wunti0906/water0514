@@ -34,8 +34,8 @@ def home():
 
 @app.route('/map')
 def map_page():
-    # 它會優先找 Vercel 上的設定，找不到才會用你貼的這個新 Key
-    maps_key = os.environ.get('GOOGLE_MAPS_API_KEY', 'AIzaSyBiLdkgYCb6_UqzUAVUyBPV8cGfUPAL0bU')
+    # 這樣寫 GitHub 就抓不到 Key，因為它是從系統環境變數去抓的
+    maps_key = os.environ.get('GOOGLE_MAPS_API_KEY') 
     return render_template('index.html', google_maps_api_key=maps_key)
 
 @app.route('/get_fountains', methods=['GET'])
