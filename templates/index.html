@@ -144,7 +144,7 @@
 <script>
     let map;
     let currentUserCoords = null;
-    const puCenter = { lat: 24.2268, lng: 120.5772 }; // 靜宜大學中心點 [cite: 14]
+    const puCenter = { lat: 24.2268, lng: 120.5772 }; // 靜宜大學中心點
 
     function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
@@ -224,7 +224,7 @@ const options = {
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
-            // 成功獲取座標 [cite: 25]
+            // 成功獲取座標
             currentUserCoords = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude

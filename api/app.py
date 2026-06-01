@@ -28,6 +28,11 @@ if not firebase_admin._apps:
 db = firestore.client()
 # --- 路由設定 ---
 
+
+@app.route('/sdgs')
+def sdgs_page():
+    return render_template('sdg_info.html')
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -72,3 +77,6 @@ def add_fountain():
 # Vercel 部署時不需要 app.run()，這行僅供本地測試使用
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
